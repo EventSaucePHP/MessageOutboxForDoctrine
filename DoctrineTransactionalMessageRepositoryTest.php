@@ -3,6 +3,7 @@
 namespace EventSauce\MessageOutbox\DoctrineOutbox;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\DriverManager;
 use EventSauce\EventSourcing\AggregateRootId;
 use EventSauce\EventSourcing\MessageRepository;
@@ -12,12 +13,18 @@ use EventSauce\MessageOutbox\TestTooling\TransactionalMessageRepositoryTestCase;
 use EventSauce\MessageRepository\DoctrineMessageRepository\DoctrineUuidV4MessageRepository;
 use EventSauce\MessageRepository\DoctrineMessageRepository\DummyAggregateRootId;
 
+use function interface_exists;
+
 class DoctrineTransactionalMessageRepositoryTest extends TransactionalMessageRepositoryTestCase
 {
     private Connection $connection;
 
     protected function setUp(): void
     {
+        if (interface_exists(ResultStatement::class)) {
+            $this->markTestSkipped('Doctrine v2 installed');
+        }
+
         parent::setUp();
 
         $this->connection = DriverManager::getConnection(

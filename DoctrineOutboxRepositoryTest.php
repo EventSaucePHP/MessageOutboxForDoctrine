@@ -3,9 +3,12 @@
 namespace EventSauce\MessageOutbox\DoctrineOutbox;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\ResultStatement;
 use Doctrine\DBAL\DriverManager;
 use EventSauce\EventSourcing\Serialization\ConstructingMessageSerializer;
 use EventSauce\MessageOutbox\TestTooling\OutboxRepositoryTestCase;
+
+use function interface_exists;
 
 class DoctrineOutboxRepositoryTest extends OutboxRepositoryTestCase
 {
@@ -13,6 +16,10 @@ class DoctrineOutboxRepositoryTest extends OutboxRepositoryTestCase
 
     protected function setUp(): void
     {
+        if (interface_exists(ResultStatement::class)) {
+            $this->markTestSkipped('Doctrine v2 installed');
+        }
+
         parent::setUp();
 
         $this->connection = DriverManager::getConnection(
